@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Bot Pairing</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 16px;
+      margin-bottom: 15px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    input:focus {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #25D366;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #1ebe57;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #result {
+      margin-top: 25px;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .success {
+      background: rgba(37, 211, 102, 0.15);
+      color: #25D366;
+      display: block !important;
+    }
+
+    .error {
+      background: rgba(255, 70, 70, 0.15);
+      color: #ff6b6b;
+      display: block !important;
+    }
+
+    .loading {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ccc;
+      display: block !important;
+    }
+
+    .footer {
+      margin-top: 25px;
+      font-size: 12px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🤖</div>
+    <h1>WhatsApp Bot Pairing</h1>
+    <p>Enter your number with country code<br>Example: 2348012345678</p>
+
+    <input type="text" id="number" placeholder="2348012345678" maxlength="15">
+    <button onclick="getCode()">Get Pairing Code</button>
+
+    <div id="result"></div>
+
+    <div class="footer">Powered by Multi Session Bot</div>
+  </div>
+
+  <script>
+    async function getCode() {
+      const number = document.getElementById('number').value.replace(/\D/g, '');
+      const result = document.getElementById('result');
+
+      if (!number || number.length < 10) {
+        result.className = 'error';
+        result.innerText = 'Please enter a valid number';
+        return;
+      }
+
+      result.className = 'loading';
+      result.innerText = 'Generating code...';
+
+      try {
+        const res = await fetch('/pair?number=' + number);
+        const data = await res.json();
+
+        if (data.code) {
+          result.className = 'success';
+          result.innerHTML = `Your Pairing Code:<br><span style="font-size:28px">${data.code}</span>`;
+        } else {
+          result.className = 'error';
+          result.innerText = data.error || 'Failed to generate code';
+        }
+      } catch (err) {
+        result.className = 'error';
+        result.innerText = 'Server error. Try again.';
+      }
+    }
+  </script>
+</body>
+</html>
